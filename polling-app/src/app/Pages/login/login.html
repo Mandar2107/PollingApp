@@ -1,10 +1,57 @@
 <div class="login-container">
-  <h2>Login</h2>
-  <form (ngSubmit)="login()">
-    <input type="email" [(ngModel)]="email" name="email" placeholder="Email" required>
-    <input type="password" [(ngModel)]="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-  </form>
-  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
-  <p>Don't have an account? <a routerLink="/register">Register</a></p>
+  <div class="login-box">
+    <!-- Logo -->
+    <div class="logo">
+      <img src="https://tse4.mm.bing.net/th/id/OIP.F2oEM9PlLc-gcsBO-4aTBwHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" alt="PollMaster Logo" />
+      <h1>PollMaster</h1>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <h2>Login</h2>
+
+      <!-- Email -->
+      <div class="form-group">
+        <input
+          type="email"
+          formControlName="email"
+          name="username"
+          autocomplete="username"
+          placeholder="Email" />
+        <div class="error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+          Valid email is required
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <input
+          type="password"
+          formControlName="password"
+          name="password"
+          autocomplete="current-password"
+          placeholder="Password" />
+        <div class="error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          Password is required
+        </div>
+      </div>
+
+      <!-- Submit button with loading -->
+      <button type="submit" class="btn primary-btn" [disabled]="loginForm.invalid || loading">
+        <span *ngIf="loading">Logging in...</span>
+        <span *ngIf="!loading">Login</span>
+      </button>
+
+      <!-- Server error message -->
+      <div class="error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+    </form>
+
+    <!-- Register Redirect -->
+    <p class="register-text">
+      Not registered yet?
+      <a routerLink="/register">Create an account</a>
+    </p>
+  </div>
 </div>
