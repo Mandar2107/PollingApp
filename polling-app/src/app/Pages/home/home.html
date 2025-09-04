@@ -1,0 +1,52 @@
+<div class="home-container">
+
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <mat-card class="card">
+      <h3>Total Polls</h3>
+      <p>{{ totalPolls }}</p>
+    </mat-card>
+    <mat-card class="card active">
+      <h3>Active Polls</h3>
+      <p>{{ activePolls }}</p>
+    </mat-card>
+    <mat-card class="card completed">
+      <h3>Completed Polls</h3>
+      <p>{{ completedPolls }}</p>
+    </mat-card>
+  </div>
+
+  <!-- Chart Card -->
+  <mat-card class="chart-card">
+    <mat-card-header>
+      <mat-card-title>Status Overview</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="chart-content">
+      <canvas id="pollChart"></canvas>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Latest Polls -->
+<mat-card class="latest-polls-card">
+  <mat-card-header>
+    <mat-card-title>Latest Polls</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <ul class="latest-polls">
+      <li *ngFor="let poll of latestPolls"
+          [routerLink]="['/poll', poll.id]"
+          class="poll-link" >
+        <span class="question">{{ poll.question }}</span>
+        <span class="status"
+              [class.active]="isPollActive(poll.expiresAt)"
+              [class.completed]="!isPollActive(poll.expiresAt)">
+          {{ isPollActive(poll.expiresAt) ? 'Active' : 'Completed' }}
+        </span>
+      </li>
+    </ul>
+  </mat-card-content>
+</mat-card>
+
+
+  <p *ngIf="isLoading">Loading polls...</p>
+</div>

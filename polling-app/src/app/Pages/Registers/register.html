@@ -1,0 +1,45 @@
+<div class="register-container">
+  <div class="register-box">
+    <div class="logo">
+      <img src="https://tse4.mm.bing.net/th/id/OIP.F2oEM9PlLc-gcsBO-4aTBwHaHa" alt="PollMaster Logo" />
+      <h1>PollMaster</h1>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <h2>Create Account</h2>
+
+      <div class="form-group">
+        <input type="text" formControlName="fullName" placeholder="Full Name" />
+      </div>
+
+      <div class="form-group">
+        <input type="text" formControlName="userName" placeholder="Username" />
+      </div>
+
+      <div class="form-group">
+        <input type="email" formControlName="email" placeholder="Email" />
+      </div>
+
+      <div class="form-group">
+        <input type="password" formControlName="password" placeholder="Password" />
+      </div>
+
+      <div class="form-group">
+        <input type="password" formControlName="confirmPassword" placeholder="Confirm Password" />
+      </div>
+
+      <button type="submit" class="btn primary-btn" [disabled]="loading">
+        {{ loading ? 'Registering...' : 'Register' }}
+      </button>
+    </form>
+
+    <!-- Error Message -->
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <!-- Login Redirect -->
+    <p class="login-text">
+      Already have an account?
+      <a routerLink="/login">Login here</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,139 @@
+<div class="polls-container">
+  <h2>My Polls</h2>
+
+  <!-- Create Poll Button -->
+  <div class="add-btn-container">
+    <button class="add-btn" (click)="showCreateForm()">+ Create Poll</button>
+  </div>
+
+  <!-- Search Input -->
+  <div class="search-container">
+    <input
+      type="text"
+      placeholder="Search polls..."
+      [(ngModel)]="searchTerm"
+      (input)="applyFilters()"
+    />
+  </div>
+
+  <!-- Polls Table -->
+  <table class="polls-table">
+    <thead>
+      <tr>
+        <th (click)="sort('question')">Question</th>
+        <th (click)="sort('createdAt')">Created</th>
+        <th (click)="sort('expiresAt')">Expires</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let poll of filteredPolls">
+        <td>{{ poll.question }}</td>
+        <td>{{ poll.createdAt | date : 'short' }}</td>
+        <td>{{ poll.expiresAt | date : 'short' }}</td>
+        <td [class.active]="isActive(poll)" [class.expired]="!isActive(poll)">
+          {{ isActive(poll) ? 'Active' : 'Expired' }}
+        </td>
+        <td>
+          <button class="vote-btn" (click)="vote(poll)">
+            {{ showResultsMap[poll.id] ? 'Results' : 'Vote' }}
+          </button>
+          <button class="edit-btn" (click)="showEditForm(poll)">Edit</button>
+          <button class="delete-btn" (click)="deletePoll(poll.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
+    <button
+      *ngFor="let page of [].constructor(totalPages); let i = index"
+      (click)="goToPage(i + 1)"
+      [class.active]="currentPage === i + 1"
+    >
+      {{ i + 1 }}
+    </button>
+    <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+      Next
+    </button>
+  </div>
+
+  <!-- Create/Edit Poll Modal -->
+  <div class="modal" *ngIf="showForm">
+    <div class="modal-content">
+      <span class="close" (click)="closeForm()">&times;</span>
+      <h3>{{ formTitle }}</h3>
+      <form (ngSubmit)="savePoll()">
+        <div class="form-group">
+          <label for="question">Question</label>
+          <input id="question" type="text" [(ngModel)]="question" name="question" required />
+        </div>
+
+        <div class="form-group">
+          <!-- <label>Options</label>
+          <div *ngFor="let option of options; let i=index" class="option-item">
+            <input type="text" [(ngModel)]="options[i]" [name]="'option'+i"
+                   required
+                   (keydown.press)="i < options.length - 1 ? focusNextOption(i) : addOption()">
+
+            <button type="button" class="remove-btn" (click)="removeOption(i)" *ngIf="options.length>2">❌</button>
+          </div>
+          <button type="button" class="add-btn" (click)="addOption()">+ Add Option</button> -->
+<label>Options</label>
+          <div *ngFor="let option of options; let i = index; trackBy: trackByIndex" class="option-item">
+<input
+  type="text"
+  [(ngModel)]="options[i]"
+  [name]="'option'+i"
+  required
+  (keydown)="onFPress($event, i)"
+>
+
+  <button type="button" class="remove-btn" (click)="removeOption(i)" *ngIf="options.length > 2">❌</button>
+</div>
+<button type="button" class="add-btn" (click)="addOption()">+ Add Option</button>
+        </div>
+
+        <div class="form-group">
+          <label for="expiresAt">Expires At</label>
+          <input id="expiresAt" type="date" [(ngModel)]="expiresAt" name="expiresAt" required />
+        </div>
+
+        <button type="submit" class="submit-btn">Save Poll</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Voting Modal -->
+  <div class="modal" *ngIf="showVoteForm && activePoll">
+    <div class="modal-content">
+      <span class="close" (click)="closeVoteForm()">&times;</span>
+      <h3>{{ activePoll.question }}</h3>
+
+      <!-- Voting Options -->
+      <div *ngIf="!showResultsMap[activePoll.id]">
+        <label *ngFor="let option of activePoll.options; let i = index" class="vote-label">
+          <input type="radio" [(ngModel)]="selectedOptionIndex" [value]="i" name="voteOption" />
+          {{ option.text }}
+        </label>
+        <button class="submit-btn" (click)="submitVote()">Submit Vote</button>
+      </div>
+
+      <!-- Results -->
+      <div *ngIf="showResultsMap[activePoll.id]">
+        <div *ngFor="let option of activePoll.options; let i = index" class="result-item">
+          <div class="option-text">
+            {{ option.text }} - {{ option.voteCount }} votes ({{ getVotePercentage(i) }}%)
+          </div>
+          <div class="bar-container">
+            <div class="bar-fill" [style.width.%]="getVotePercentage(i)"></div>
+          </div>
+        </div>
+        <button class="submit-btn" (click)="closeVoteForm()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -14,7 +14,7 @@ export const routes: Routes = [
       { path: 'home', loadComponent: () => import('./Pages/home/home').then(m => m.HomeComponent) },
       { path: 'polls', loadComponent: () => import('./Pages/polls/polls').then(m => m.PollsComponent) },
       { path: 'profile', loadComponent: () => import('./Pages/profile/profile').then(m => m.ProfileComponent) },
-      { path: 'create', loadComponent: () => import('./Pages/create-poll/create-poll').then(m => m.CreatePoll) },
+      { path: 'poll-dashboard', loadComponent: () => import('./Pages/poll-dashboard/poll-dashboard').then(m => m.PollDashboardComponent) },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },
