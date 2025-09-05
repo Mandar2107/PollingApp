@@ -34,6 +34,7 @@
     "@angular/platform-server": "^20.2.0",
     "@angular/router": "^20.2.0",
     "@angular/ssr": "^20.2.1",
+    "@microsoft/signalr": "^9.0.6",
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",

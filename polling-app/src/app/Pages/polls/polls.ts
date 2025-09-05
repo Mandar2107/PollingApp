@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { PollService, PollDto, PollCreateDto, VoteRequestDto } from '../../Core/services/poll.service';
 
 @Component({
@@ -17,20 +18,17 @@ export class PollsComponent implements OnInit {
   sortColumn = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  // Pagination
   currentPage = 1;
   pageSize = 5;
   totalPages = 1;
 
-  // Form
   showForm = false;
   formTitle = 'Create Poll';
   editingPollId: number | null = null;
   question = '';
-  options: string[] = ['',''];
+  options: string[] = ['', ''];
   expiresAt = '';
 
-  // Vote modal
   showVoteForm = false;
   activePoll: PollDto | null = null;
   selectedOptionIndex: number | null = null;
@@ -38,20 +36,23 @@ export class PollsComponent implements OnInit {
   // Track results for polls that user has voted
   showResultsMap: { [pollId: number]: boolean } = {};
 
-  constructor(private pollService: PollService) {}
+  isSubmittingVote = false;
+
+  constructor(
+    private pollService: PollService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadPolls();
   }
 
-  // Load polls created by the logged-in user
   loadPolls(): void {
     this.pollService.getMyPolls(this.currentPage, this.pageSize).subscribe({
       next: (res) => {
         this.polls = res.polls;
         this.totalPages = Math.ceil(res.totalCount / this.pageSize);
 
-        // Mark polls already voted
         this.polls.forEach(p => {
           this.showResultsMap[p.id] = p.isVoted || false;
         });
@@ -60,22 +61,14 @@ export class PollsComponent implements OnInit {
       }
     });
   }
-// Called when Enter is pressed in an option input
-onFPress(event: KeyboardEvent, index: number) {
 
-}
-
-
-  // === Search / Sort / Pagination ===
   applyFilters() {
     let result = [...this.polls];
 
-    // Search
     if (this.searchTerm) {
       result = result.filter(p => p.question.toLowerCase().includes(this.searchTerm.toLowerCase()));
     }
 
-    // Sort
     if (this.sortColumn) {
       result.sort((a: any, b: any) => {
         const valA = (a as any)[this.sortColumn];
@@ -105,19 +98,18 @@ onFPress(event: KeyboardEvent, index: number) {
     this.loadPolls();
   }
 
-  // === Poll CRUD ===
   showCreateForm() {
     this.showForm = true;
     this.formTitle = 'Create Poll';
     this.editingPollId = null;
     this.question = '';
-    this.options = ['',''];
+    this.options = ['', ''];
     this.expiresAt = '';
   }
-trackByIndex(index: number, item: any): number {
-  return index; // Angular now knows which input corresponds to which index
-}
 
+  trackByIndex(index: number, item: any): number {
+    return index;
+  }
 
   showEditForm(poll: PollDto) {
     this.showForm = true;
@@ -142,16 +134,38 @@ trackByIndex(index: number, item: any): number {
   }
 
   savePoll() {
-    const dto: PollCreateDto = { question: this.question, options: this.options, expiresAt: this.expiresAt };
+    if (!this.question.trim() || this.options.filter(o => o.trim()).length < 2) {
+      alert('Please enter a question and at least 2 valid options.');
+      return;
+    }
+
+    const dto: PollCreateDto = {
+      question: this.question.trim(),
+      options: this.options.filter(o => o.trim()),
+      expiresAt: this.expiresAt
+    };
 
     if (this.editingPollId) {
-      console.warn('Update not implemented yet');
+      this.pollService.updatePoll(this.editingPollId, dto).subscribe({
+        next: () => {
+          this.closeForm();
+          this.router.navigate(['/polls']); 
+        }
+      });
     } else {
-      this.pollService.createPoll(dto).subscribe(() => {
-        this.loadPolls();
-        this.closeForm();
+      this.pollService.createPoll(dto).subscribe({
+        next: () => {
+          this.closeForm();
+          this.router.navigate(['/polls']);
+        }
       });
     }
+  }
+
+  get isPollValid(): boolean {
+    if (!this.question?.trim()) return false;
+    const validOptions = this.options.filter(o => !!o && o.trim().length > 0);
+    return validOptions.length >= 2;
   }
 
   deletePoll(id: number) {
@@ -160,7 +174,6 @@ trackByIndex(index: number, item: any): number {
     }
   }
 
-  // === Voting ===
   vote(poll: PollDto) {
     this.showVoteForm = true;
     this.activePoll = poll;
@@ -172,17 +185,33 @@ trackByIndex(index: number, item: any): number {
     this.activePoll = null;
   }
 
-  submitVote() {
-    if (!this.activePoll || this.selectedOptionIndex === null) return;
+submitVote() {
+  if (!this.activePoll || this.selectedOptionIndex === null || this.isSubmittingVote) return;
 
-    const optionId = this.activePoll.options[this.selectedOptionIndex].id;
-    const dto: VoteRequestDto = { pollOptionId: optionId };
+  this.isSubmittingVote = true;
+  const optionId = this.activePoll.options[this.selectedOptionIndex].id;
+  const dto: VoteRequestDto = { pollOptionId: optionId };
 
-    this.pollService.vote(this.activePoll.id, dto).subscribe(() => {
+  this.pollService.vote(this.activePoll.id, dto).subscribe({
+    next: () => {
       this.showResultsMap[this.activePoll!.id] = true;
-      this.pollService.getPollById(this.activePoll!.id).subscribe(p => this.activePoll = p);
-    });
-  }
+
+
+      this.pollService.getPollById(this.activePoll!.id).subscribe(p => {
+        this.activePoll = p;
+        this.loadPolls();
+
+        this.closeVoteForm();
+
+        // ✅ Navigate to /polls so list reloads & results are visible
+        this.router.navigate(['/polls']);
+      });
+    },
+    error: () => {
+      this.isSubmittingVote = false;
+    }
+  });
+}
 
   getVotePercentage(optionIndex: number): number {
     if (!this.activePoll) return 0;
@@ -195,7 +224,7 @@ trackByIndex(index: number, item: any): number {
     return new Date(poll.expiresAt) > new Date();
   }
 
-  // === Helper for option focus fix ===
+  // 🔹 Focus management
   focusNextOption(index: number) {
     const inputs = document.querySelectorAll<HTMLInputElement>('.option-item input');
     const next = inputs[index + 1];

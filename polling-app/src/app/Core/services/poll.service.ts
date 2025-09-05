@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// Poll DTOs
+// === DTOs ===
 export interface PollOptionDto {
   id: number;
   text: string;
@@ -17,7 +17,11 @@ export interface PollDto {
   isExpired: boolean;
   options: PollOptionDto[];
   totalVotes: number;
-   isVoted?: boolean;
+  isVoted?: boolean;
+  CompltedPolls :number;
+  TotalPolls :number;
+  ActivePolls :number;
+  MYpolls :number;
 }
 
 export interface PollCreateDto {
@@ -30,25 +34,23 @@ export interface VoteRequestDto {
   pollOptionId: number;
 }
 
+// === Service ===
 @Injectable({
   providedIn: 'root'
 })
 export class PollService {
-  private baseUrl = 'https://localhost:7219/api/Polls'; // ✅ plural to match backend
- private  voteurl = 'https://localhost:7219/api/Votes'; // ✅ plural to match backend
+  private baseUrl = 'https://localhost:7219/api/Polls'; // Backend API
+  private voteUrl = 'https://localhost:7219/api/Votes';
+
   constructor(private http: HttpClient) {}
 
-  // Utility to add JWT token header
+  // Add Authorization headers
   private getAuthHeaders(): HttpHeaders {
-  const token = localStorage.getItem('accessToken');
-   console.log('Token used for request:', token);
-  return new HttpHeaders({
-    Authorization: `Bearer ${token || ''}`
-  });
-}
+    const token = localStorage.getItem('accessToken');
+    return new HttpHeaders({ Authorization: `Bearer ${token || ''}` });
+  }
 
-
-  // Get all polls with pagination, search, sort, and status filter
+  // === Poll CRUD ===
   getAllPolls(
     page: number = 1,
     pageSize: number = 5,
@@ -56,69 +58,50 @@ export class PollService {
     sortBy?: string,
     sortOrder?: 'asc' | 'desc',
     status?: string
-  ): Observable<{ polls: PollDto[], totalCount: number }> {
+  ): Observable<{ polls: PollDto[]; totalCount: number }> {
     let query = `?page=${page}&pageSize=${pageSize}`;
     if (search) query += `&search=${search}`;
     if (sortBy) query += `&sortBy=${sortBy}`;
     if (sortOrder) query += `&sortOrder=${sortOrder}`;
     if (status) query += `&status=${status}`;
- console.log('GET Polls request URL:', `${this.baseUrl}${query}`);
-    return this.http.get<{ polls: PollDto[], totalCount: number }>(
+
+    return this.http.get<{ polls: PollDto[]; totalCount: number }>(
       `${this.baseUrl}${query}`,
       { headers: this.getAuthHeaders() }
     );
   }
 
-  // Get a single poll by ID
   getPollById(id: number): Observable<PollDto> {
-    return this.http.get<PollDto>(
-      `${this.baseUrl}/${id}`,
-      { headers: this.getAuthHeaders() }
-    );
+    return this.http.get<PollDto>(`${this.baseUrl}/${id}`, { headers: this.getAuthHeaders() });
   }
 
-  // Create a new poll
   createPoll(poll: PollCreateDto): Observable<PollDto> {
-    return this.http.post<PollDto>(
-      `${this.baseUrl}`,
-      poll,
-      { headers: this.getAuthHeaders() }
-    );
+    return this.http.post<PollDto>(this.baseUrl, poll, { headers: this.getAuthHeaders() });
   }
 
-  // Update a poll
   updatePoll(id: number, poll: PollCreateDto): Observable<PollDto> {
-    return this.http.put<PollDto>(
-      `${this.baseUrl}/${id}`,
-      poll,
-      { headers: this.getAuthHeaders() }
-    );
+    return this.http.put<PollDto>(`${this.baseUrl}/${id}`, poll, { headers: this.getAuthHeaders() });
   }
 
-getMyPolls(page: number = 1, pageSize: number = 5): Observable<{ polls: PollDto[], totalCount: number }> {
-  const query = `?page=${page}&pageSize=${pageSize}`;
-  return this.http.get<{ polls: PollDto[], totalCount: number }>(
-    `${this.voteurl}/MyPolls${query}`,
-    { headers: this.getAuthHeaders() }
-  );
-}
-
-  // Delete a poll
   deletePoll(id: number): Observable<any> {
-    return this.http.delete(
-      `${this.baseUrl}/${id}`,
+    return this.http.delete(`${this.baseUrl}/${id}`, { headers: this.getAuthHeaders() });
+  }
+
+  // === My Polls (User-specific) ===
+  getMyPolls(page: number = 1, pageSize: number = 5): Observable<{ polls: PollDto[]; totalCount: number }> {
+    const query = `?page=${page}&pageSize=${pageSize}`;
+    return this.http.get<{ polls: PollDto[]; totalCount: number }>(
+      `${this.baseUrl}/MyPolls${query}`,
       { headers: this.getAuthHeaders() }
     );
   }
 
-  // Vote on a poll
+  // === Voting ===
   vote(pollId: number, dto: VoteRequestDto): Observable<any> {
-    return this.http.post(`${this.voteurl}/SubmitVote/${pollId}`, dto, { headers: this.getAuthHeaders() });
+    return this.http.post(`${this.voteUrl}/SubmitVote/${pollId}`, dto, { headers: this.getAuthHeaders() });
   }
 
-  // Get votes for a poll (GET)
   getVotes(pollId: number): Observable<any> {
-    return this.http.get(`${this.voteurl}/GetVotes/${pollId}`, { headers: this.getAuthHeaders() });
+    return this.http.get(`${this.voteUrl}/GetVotes/${pollId}`, { headers: this.getAuthHeaders() });
   }
 }
-

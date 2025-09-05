@@ -23,26 +23,34 @@
           <span [class.active]="isActive(poll)" [class.expired]="!isActive(poll)">
             {{ isActive(poll) ? 'Active' : 'Expired' }}
           </span>
+          <span *ngIf="poll.isVoted" style="color: #28a745; font-weight:bold; margin-left:10px;">
+            You have voted
+          </span>
         </div>
       </div>
 
-      <!-- Poll Options -->
-      <div class="poll-options" *ngIf="!showResultsMap[poll.id] && isActive(poll)">
-        <label *ngFor="let option of poll.options; let i=index">
-          <input type="radio" [(ngModel)]="selectedOptions[poll.id]" [value]="i" name="vote{{poll.id}}">
+      <!-- Vote Form -->
+      <div class="poll-options" *ngIf="!(showResultsMap[poll.id] ?? false) && isActive(poll)">
+        <label *ngFor="let option of poll.options; let i=index" class="vote-option">
+          <input type="radio"
+                 [(ngModel)]="selectedOptions[poll.id]"
+                 [value]="i"
+                 name="vote{{poll.id}}">
           {{ option.text }}
         </label>
-        <button (click)="submitVote(poll)" [disabled]="selectedOptions[poll.id] === undefined">
+        <button class="vote-btn"
+                (click)="submitVote(poll)"
+                [disabled]="selectedOptions[poll.id] === undefined">
           Vote
         </button>
       </div>
 
-      <!-- Already Voted / Poll Results -->
+      <!-- Results -->
       <div class="poll-results" *ngIf="showResultsMap[poll.id] || !isActive(poll)">
         <div *ngFor="let option of poll.options; let i=index" class="result-item">
           <span>{{ option.text }} - {{ option.voteCount }} votes ({{ getVotePercentage(poll, i) }}%)</span>
           <div class="bar-container">
-            <div class="bar-fill" [style.width.%]="getVotePercentage(poll, i)"></div>
+            <div class="bar-fill" [ngStyle]="getBarStyle(poll, i)"></div>
           </div>
         </div>
       </div>

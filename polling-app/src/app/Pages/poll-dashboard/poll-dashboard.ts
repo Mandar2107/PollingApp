@@ -23,6 +23,9 @@ export class PollDashboardComponent implements OnInit {
   selectedOptions: { [pollId: number]: number } = {};
   showResultsMap: { [pollId: number]: boolean } = {};
 
+  // Array of colors for result bars
+  barColors: string[] = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#20c997'];
+
   constructor(private pollService: PollService) {}
 
   ngOnInit(): void {
@@ -33,11 +36,8 @@ export class PollDashboardComponent implements OnInit {
     this.pollService.getAllPolls(this.currentPage, this.pageSize, this.searchTerm).subscribe(res => {
       this.polls = res.polls;
 
-      const userId = localStorage.getItem('userId'); // or extract from JWT
       this.polls.forEach(poll => {
-        // Check if user has already voted
-        const hasVoted = poll.options.some(option => (option as any).userIds?.includes(userId));
-        this.showResultsMap[poll.id] = hasVoted;
+        this.showResultsMap[poll.id] = poll.isVoted ?? false;
       });
 
       this.totalPages = Math.ceil(res.totalCount / this.pageSize);
@@ -101,5 +101,17 @@ export class PollDashboardComponent implements OnInit {
 
   isActive(poll: PollDto): boolean {
     return new Date(poll.expiresAt) > new Date();
+  }
+
+  getBarColor(index: number): string {
+    return this.barColors[index % this.barColors.length];
+  }
+
+  getBarStyle(poll: PollDto, optionIndex: number) {
+    return {
+      width: this.getVotePercentage(poll, optionIndex) + '%',
+      'background-color': this.getBarColor(optionIndex),
+      transition: 'width 0.8s ease'
+    };
   }
 }

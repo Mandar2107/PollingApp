@@ -1,23 +1,16 @@
-<div class="profile-container">
-  <div class="profile-card">
-    <!-- Profile Header -->
-    <div class="profile-header">
-      <img src="https://tse4.mm.bing.net/th/id/OIP.oM71KD-EN9AG92eLdv6WwwHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" alt="User Avatar" class="profile-avatar">
-      <h2 class="profile-name">John Doe</h2>
-      <p class="profile-email">john.doe@example.com</p>
-    </div>
+<div class="profile-card">
+  <div class="profile-header">
+    <img [src]="user.avatarUrl" alt="Avatar" class="profile-avatar">
+    <h2>{{ user.username }}</h2>
+    <p>{{ user.email }}</p>
+  </div>
 
-    <!-- Profile Info -->
-    <div class="profile-info">
-      <h3>Account Information</h3>
-      <ul>
-        <li><strong>Username:</strong> johndoe</li>
-        <li><strong>Email:</strong> john.doe@example.com</li>
-        <li><strong>Joined:</strong> 02-Sep-2025</li>
-        <li><strong>Status:</strong> Active</li>
-      </ul>
-    </div>
-
+  <div class="profile-info">
+    <h3>Account Info</h3>
+    <ul>
+      <li><strong>Name:</strong> {{ user.username }}</li>
+      <li><strong>username:</strong> {{ user.email }}</li>
+      <li><strong>Status:</strong> {{ user.status }}</li>
+    </ul>
   </div>
 </div>
-

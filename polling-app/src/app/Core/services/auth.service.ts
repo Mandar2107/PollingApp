@@ -58,13 +58,11 @@ export class AuthService {
       catchError(this.handleError)
     );
   }
-
-  logout() {
-    if (this.isBrowser) {
-      localStorage.removeItem('token');
-    }
-    this.isAuthenticatedSubject.next(false);
-  }
+logout() {
+  console.log('AuthService logout called');
+  localStorage.removeItem('accessToken');
+  // this.isAuthenticatedSubject.next(false);
+}
 
   setToken(token: string) {
     if (this.isBrowser) {
