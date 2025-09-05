@@ -1,0 +1,1 @@
+Server=Mandar\\SQLEXPRESS;Database=PollingAppNewDb;Trusted_Connection=True;TrustServerCertificate=True;
