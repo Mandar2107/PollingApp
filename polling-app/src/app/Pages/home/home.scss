@@ -1,0 +1,103 @@
+.home-container {
+  padding: 20px;
+  background: #f9f9f9;
+}
+
+/* Summary Cards */
+.summary-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.card {
+  flex: 1;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+.card.active { background-color: #3f51b5; color: #fff; }
+.card.completed { background-color: #ff4081; color: #fff; }
+.card h3 { margin-bottom: 10px; }
+
+/* Chart */
+.chart-container {
+  width: 300px;
+  height: 300px;
+  margin: 0 auto 30px auto;
+}
+
+/* Poll Table */
+.polls-table-container {
+  overflow-x: auto;
+}
+.polls-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.polls-table th, .polls-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+}
+.polls-table th {
+  background: #f5f5f5;
+  text-align: left;
+}
+.active { color: green; font-weight: bold; }
+.completed { color: red; font-weight: bold; }
+
+.home-container {
+  padding: 20px;
+}
+
+.summary-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.summary-cards .card {
+  flex: 1;
+  text-align: center;
+  padding: 20px;
+}
+
+.chart-card {
+  margin-bottom: 20px;
+  height: 300px;
+}
+
+.chart-content {
+  height: 100% !important;
+}
+
+.latest-polls {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.poll-link {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.poll-link:hover {
+  background-color: #f5f5f5;
+}
+
+.status.active {
+  color: green;
+  font-weight: bold;
+}
+
+.status.completed {
+  color: red;
+  font-weight: bold;
+}

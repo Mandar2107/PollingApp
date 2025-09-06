@@ -1,0 +1,12 @@
+/* Bootstrap-only global styles */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8f9fa; // light gray background
+}
+
+.sidebar {
+  min-height: 100vh;
+}

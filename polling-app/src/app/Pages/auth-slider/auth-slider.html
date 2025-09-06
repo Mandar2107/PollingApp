@@ -1,0 +1,46 @@
+<div class="auth-wrapper">
+  <div class="auth-container" [class.right-panel-active]="isSignUpActive">
+
+    <!-- Sign Up Form -->
+    <div class="form-container sign-up-container">
+      <form [formGroup]="registerForm" (ngSubmit)="register()">
+        <h1>Create Account</h1>
+        <input type="text" placeholder="Full Name" formControlName="fullName" />
+        <input type="text" placeholder="Username" formControlName="userName" />
+        <input type="email" placeholder="Email" formControlName="email" />
+        <input type="password" placeholder="Password" formControlName="password" />
+        <input type="password" placeholder="Confirm Password" formControlName="confirmPassword" />
+        <button type="submit">{{ loading ? 'Registering...' : 'Sign Up' }}</button>
+        <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+      </form>
+    </div>
+
+    <!-- Sign In Form -->
+    <div class="form-container sign-in-container">
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
+        <h1>Sign in</h1>
+        <input type="email" placeholder="Email" formControlName="email" />
+        <input type="password" placeholder="Password" formControlName="password" />
+        <button type="submit">{{ loading ? 'Logging in...' : 'Sign In' }}</button>
+        <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+      </form>
+    </div>
+
+    <!-- Overlay Panels -->
+    <div class="overlay-container">
+      <div class="overlay">
+        <div class="overlay-panel overlay-left">
+          <h1>Welcome Back!</h1>
+          <p>To keep connected with us, please login with your personal info</p>
+          <button class="ghost" (click)="toggleForm(false)">Sign In</button>
+        </div>
+        <div class="overlay-panel overlay-right">
+          <h1>Hello, Friend!</h1>
+          <p>Enter your personal details and start your journey with us</p>
+          <button class="ghost" (click)="toggleForm(true)">Sign Up</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

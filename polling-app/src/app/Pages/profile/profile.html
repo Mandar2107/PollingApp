@@ -1,0 +1,16 @@
+<div class="profile-card">
+  <div class="profile-header">
+    <img [src]="user.avatarUrl" alt="Avatar" class="profile-avatar">
+    <h2>{{ user.username }}</h2>
+    <p>{{ user.email }}</p>
+  </div>
+
+  <div class="profile-info">
+    <h3>Account Info</h3>
+    <ul>
+      <li><strong>Name:</strong> {{ user.username }}</li>
+      <li><strong>username:</strong> {{ user.email }}</li>
+      <li><strong>Status:</strong> {{ user.status }}</li>
+    </ul>
+  </div>
+</div>

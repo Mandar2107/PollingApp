@@ -1,0 +1,70 @@
+<div class="poll-dashboard">
+
+  <!-- Search & Sorting -->
+  <div class="top-bar">
+    <input type="text" [(ngModel)]="searchTerm" placeholder="Search polls..." (input)="loadPolls()">
+    <select [(ngModel)]="sortColumn" (change)="changeSort(sortColumn)">
+      <option value="createdAt">Created</option>
+      <option value="question">Question</option>
+      <option value="totalVotes">Total Votes</option>
+    </select>
+    <button (click)="changeSort(sortColumn)">
+      {{ sortDirection==='asc' ? '↑' : '↓' }}
+    </button>
+  </div>
+
+  <!-- Poll Cards -->
+  <div class="poll-cards">
+    <div class="poll-card" *ngFor="let poll of polls">
+      <div class="poll-header">
+        <h3>{{ poll.question }}</h3>
+        <div class="poll-meta">
+          Created at: {{ poll.createdAt | date:'short' }} | Status:
+          <span [class.active]="isActive(poll)" [class.expired]="!isActive(poll)">
+            {{ isActive(poll) ? 'Active' : 'Expired' }}
+          </span>
+          <span *ngIf="poll.isVoted" style="color: #28a745; font-weight:bold; margin-left:10px;">
+            You have voted
+          </span>
+        </div>
+      </div>
+
+      <!-- Vote Form -->
+      <div class="poll-options" *ngIf="!(showResultsMap[poll.id] ?? false) && isActive(poll)">
+        <label *ngFor="let option of poll.options; let i=index" class="vote-option">
+          <input type="radio"
+                 [(ngModel)]="selectedOptions[poll.id]"
+                 [value]="i"
+                 name="vote{{poll.id}}">
+          {{ option.text }}
+        </label>
+        <button class="vote-btn"
+                (click)="submitVote(poll)"
+                [disabled]="selectedOptions[poll.id] === undefined">
+          Vote
+        </button>
+      </div>
+
+      <!-- Results -->
+      <div class="poll-results" *ngIf="showResultsMap[poll.id] || !isActive(poll)">
+        <div *ngFor="let option of poll.options; let i=index" class="result-item">
+          <span>{{ option.text }} - {{ option.voteCount }} votes ({{ getVotePercentage(poll, i) }}%)</span>
+          <div class="bar-container">
+            <div class="bar-fill" [ngStyle]="getBarStyle(poll, i)"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <button (click)="goToPage(currentPage-1)" [disabled]="currentPage===1">Prev</button>
+    <button *ngFor="let p of [].constructor(totalPages); let i=index"
+            (click)="goToPage(i+1)"
+            [class.active]="currentPage===i+1">{{i+1}}</button>
+    <button (click)="goToPage(currentPage+1)" [disabled]="currentPage===totalPages">Next</button>
+  </div>
+
+</div>

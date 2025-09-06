@@ -1,0 +1,219 @@
+.poll-dashboard {
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 10px;
+  font-family: Arial, sans-serif;
+
+  /* Top bar with search + sorting */
+  .top-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+
+    input {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 250px;
+      font-size: 14px;
+      transition: border 0.2s;
+
+      &:focus {
+        border-color: #007bff;
+        outline: none;
+      }
+    }
+
+    select {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #0056b3;
+      }
+    }
+  }
+
+  /* Poll cards layout */
+  .poll-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .poll-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    // Alternating card colors for better UX
+    &:nth-child(odd) {
+      background: #f9faff;
+    }
+
+    &:nth-child(even) {
+      background: #fff7f7;
+    }
+
+    .poll-header {
+      margin-bottom: 15px;
+
+      h3 {
+        margin: 0 0 5px 0;
+        color: #fff;
+        background-color: #007bff; // filled background for questions
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .poll-meta {
+        font-size: 13px;
+        color: #555;
+
+        .active {
+          color: green;
+          font-weight: bold;
+        }
+
+        .expired {
+          color: red;
+          font-weight: bold;
+        }
+      }
+    }
+
+    /* Poll voting */
+    .poll-options {
+      margin-bottom: 15px;
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        cursor: pointer;
+
+        input {
+          margin-right: 8px;
+        }
+      }
+
+      button {
+        margin-top: 8px;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 6px;
+        background: #28a745;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.2s, transform 0.2s;
+
+        &:hover:not(:disabled) {
+          background: #218838;
+          transform: scale(1.05);
+        }
+
+        &:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    /* Poll results */
+    .poll-results {
+      .result-item {
+        margin-bottom: 12px;
+
+        span {
+          font-size: 14px;
+          display: block;
+          margin-bottom: 4px;
+        }
+
+        .bar-container {
+          background: #e0e0e0;
+          border-radius: 6px;
+          overflow: hidden;
+          height: 16px;
+
+          .bar-fill {
+            background: #007bff;
+            height: 100%;
+            width: 0;
+            animation: fillBar 0.8s forwards;
+          }
+        }
+      }
+    }
+  }
+
+  /* Pagination */
+  .pagination {
+    text-align: center;
+    margin-top: 20px;
+
+    button {
+      padding: 6px 12px;
+      margin: 0 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &.active {
+        background: #007bff;
+        color: #fff;
+        font-weight: bold;
+      }
+
+      &:hover:not(:disabled) {
+        background: #e6f0ff;
+      }
+
+      &:disabled {
+        background: #eee;
+        color: #aaa;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  /* Animate vote bars */
+  @keyframes fillBar {
+    from {
+      width: 0%;
+    }
+    to {
+      width: var(--bar-width, 0%);
+    }
+  }
+}

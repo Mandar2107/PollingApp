@@ -1,0 +1,53 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="logo">PollMaster</h2>
+    <nav>
+      <ul>
+        <li>
+          <a routerLink="home" routerLinkActive="active">
+            <span class="material-icons icon">home</span>
+            <span class="label">Home</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="polls" routerLinkActive="active">
+            <span class="material-icons icon">create</span>
+            <span class="label">My Polls</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="poll-dashboard" routerLinkActive="active">
+            <span class="material-icons icon">bar_chart</span>
+            <span class="label">All Polls</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="profile" routerLinkActive="active">
+            <span class="material-icons icon">person</span>
+            <span class="label">Profile</span>
+          </a>
+        </li>
+       <li>
+  <button class="logout-btn" (click)="logout()">
+    <span class="material-icons icon">logout</span>
+    <span class="label">Logout</span>
+  </button>
+</li>
+
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+    <header class="header">
+      <h1>Dashboard</h1>
+    </header>
+
+    <!-- Child Components will load here -->
+    <section class="content-area">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>
