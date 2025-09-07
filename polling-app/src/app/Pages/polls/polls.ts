@@ -124,10 +124,16 @@ showEditForm(poll: PollDto) {
   this.activePoll = { ...poll }; // Store original poll for mapping IDs during save
 }
 
+closeForm() {
+  this.showForm = false;       // hide the form
+  this.editingPollId = null;   // reset editing state
+  this.question = '';          // clear question field
+  this.options = ['', ''];     // reset options array
+  this.expiresAt = '';         // reset expiry date
+}
 
-  closeForm() {
-    this.showForm = false;
-  }
+
+
 
   addOption() {
     this.options.push('');
@@ -169,7 +175,7 @@ createPoll() {
       console.log('Poll created successfully', res);
       this.closeForm();
       this.loadPolls();
-      this.router.navigate(['/polls']);
+this.loadPolls();   
     },
     error: (err) => {
       console.error('Create failed', err.error);
@@ -205,9 +211,11 @@ updatePoll() {
   this.pollService.updatePoll(this.editingPollId, dto).subscribe({
     next: (res) => {
       console.log('Poll updated successfully', res);
-      this.closeForm();
-      this.loadPolls();
-      this.router.navigate(['/polls']); // refresh page
+      console.log('Update DTO:', dto);
+       this.loadPolls();
+       this.closeForm(); 
+     
+      this.loadPolls();   
     },
     error: (err) => {
       console.error('Update failed', err.error);
@@ -256,10 +264,9 @@ submitVote() {
         this.activePoll = p;
         this.loadPolls();
 
-        this.closeVoteForm();
 
-        // ✅ Navigate to /polls so list reloads & results are visible
-        this.router.navigate(['/polls']);
+       this.loadPolls();   
+         this.closeVoteForm(); 
       });
     },
     error: () => {
