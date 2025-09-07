@@ -26,6 +26,11 @@ export class PollDashboardComponent implements OnInit {
   // Array of colors for result bars
   barColors: string[] = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#20c997'];
 
+  // Inline error message instead of alert()
+  errorMessage = '';
+
+  private searchTimeout: any;
+
   constructor(private pollService: PollService) {}
 
   ngOnInit(): void {
@@ -33,16 +38,25 @@ export class PollDashboardComponent implements OnInit {
   }
 
   loadPolls(): void {
-    this.pollService.getAllPolls(this.currentPage, this.pageSize, this.searchTerm).subscribe(res => {
-      this.polls = res.polls;
-
-      this.polls.forEach(poll => {
-        this.showResultsMap[poll.id] = poll.isVoted ?? false;
-      });
-
-      this.totalPages = Math.ceil(res.totalCount / this.pageSize);
-      this.sortPolls();
+    this.pollService.getAllPolls(this.currentPage, this.pageSize, this.searchTerm).subscribe({
+      next: (res) => {
+        this.polls = res.polls;
+        this.polls.forEach(poll => {
+          this.showResultsMap[poll.id] = poll.isVoted ?? false;
+        });
+        this.totalPages = Math.ceil(res.totalCount / this.pageSize);
+        this.sortPolls();
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load polls. Please try again.';
+      }
     });
+  }
+
+  // Debounced search
+  onSearchChange(value: string) {
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => this.loadPolls(), 400);
   }
 
   sortPolls() {
@@ -77,19 +91,21 @@ export class PollDashboardComponent implements OnInit {
 
     const optionId = poll.options[optionIndex].id;
 
+    // Optimistic update (immediate UI feedback)
+    poll.options[optionIndex].voteCount++;
+    poll.isVoted = true;
+    this.showResultsMap[poll.id] = true;
+
     this.pollService.vote(poll.id, { pollOptionId: optionId }).subscribe({
       next: () => {
-        this.showResultsMap[poll.id] = true;
-
-        // Refresh poll after voting
+        // Optional: Refresh from backend for accuracy
         this.pollService.getPollById(poll.id).subscribe(updated => {
           const index = this.polls.findIndex(p => p.id === poll.id);
           if (index > -1) this.polls[index] = updated;
         });
       },
       error: (err) => {
-        console.error('Vote submission failed:', err);
-        alert(err.error?.message || 'Something went wrong while voting!');
+        this.errorMessage = err.error?.message || 'Something went wrong while voting!';
       }
     });
   }
@@ -109,9 +125,8 @@ export class PollDashboardComponent implements OnInit {
 
   getBarStyle(poll: PollDto, optionIndex: number) {
     return {
-      width: this.getVotePercentage(poll, optionIndex) + '%',
-      'background-color': this.getBarColor(optionIndex),
-      transition: 'width 0.8s ease'
+      '--bar-width': this.getVotePercentage(poll, optionIndex) + '%',
+      'background-color': this.getBarColor(optionIndex)
     };
   }
 }

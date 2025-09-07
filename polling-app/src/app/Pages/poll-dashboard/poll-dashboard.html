@@ -1,8 +1,16 @@
 <div class="poll-dashboard">
 
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
   <!-- Search & Sorting -->
   <div class="top-bar">
-    <input type="text" [(ngModel)]="searchTerm" placeholder="Search polls..." (input)="loadPolls()">
+    <input type="text"
+           [(ngModel)]="searchTerm"
+           placeholder="Search polls..."
+           (ngModelChange)="onSearchChange($event)">
     <select [(ngModel)]="sortColumn" (change)="changeSort(sortColumn)">
       <option value="createdAt">Created</option>
       <option value="question">Question</option>
@@ -40,7 +48,7 @@
         </label>
         <button class="vote-btn"
                 (click)="submitVote(poll)"
-                [disabled]="selectedOptions[poll.id] === undefined">
+                [disabled]="selectedOptions[poll.id] === undefined || poll.isVoted">
           Vote
         </button>
       </div>
@@ -54,7 +62,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -66,5 +73,4 @@
             [class.active]="currentPage===i+1">{{i+1}}</button>
     <button (click)="goToPage(currentPage+1)" [disabled]="currentPage===totalPages">Next</button>
   </div>
-
 </div>

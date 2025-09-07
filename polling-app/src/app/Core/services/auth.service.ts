@@ -8,7 +8,6 @@ import { Token } from '@angular/compiler';
 export interface LoginRequest { email: string; password: string; }
 export interface RegisterRequest { fullName: string; userName: string; email: string; password: string; profilePictureUrl?: string; }
 export interface AuthResponse { Success: boolean; Data?: { token: string }; Message: string; }
-
 @Injectable({
   providedIn: 'root'
 })
@@ -27,45 +26,36 @@ export class AuthService {
     this.isAuthenticatedSubject.next(this.hasToken());
   }
 
-// login(request: LoginRequest): Observable<AuthResponse> {
-//     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, request).pipe(
-//       tap(response => {
-//         if (response.Success && response.Data?.token) {
-//           this.setToken(response.Data.token);
-//           this.isAuthenticatedSubject.next(true);
-//         }
-//       }),
-//       catchError(this.handleError)
-//     );
-//   }
-  login(email: string, password: string) {
+  login(email: string, password: string): Observable<AuthResponse> {
     console.log('AuthService login called with', email, password);
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, { email, password }).pipe(
-      tap(tokens => {this.storeTokens(tokens)
-        console.log('Full login response:', tokens);
-      })
-
+      tap(response => {
+        if (response.Success && response.Data?.token) {
+          this.setToken(response.Data.token);
+          this.isAuthenticatedSubject.next(true); // ✅ update guard state
+          console.log('Token stored:', response.Data.token);
+        } else {
+          console.error('Login failed: no token in response', response);
+        }
+      }),
+      catchError(this.handleError)
     );
-
   }
- private storeTokens(tokens: any) {
-  localStorage.setItem('accessToken', tokens.token || '');
-  console.log('Token stored:', tokens.token);
-}
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    console.log("register is called");
+    console.log('register is called');
     return this.http.post<AuthResponse>(`${this.baseUrl}/register`, request).pipe(
       catchError(this.handleError)
     );
   }
-logout() {
-  console.log('AuthService logout called');
-  localStorage.removeItem('accessToken');
-  // this.isAuthenticatedSubject.next(false);
-}
 
-  setToken(token: string) {
+  logout(): void {
+    console.log('AuthService logout called');
+    localStorage.removeItem('accessToken');
+    this.isAuthenticatedSubject.next(false); // ✅ guards update
+  }
+
+  private setToken(token: string): void {
     if (this.isBrowser) {
       localStorage.setItem('accessToken', token);
     }
